@@ -18,11 +18,11 @@ git clone https://github.com/tonrepo/api-product.git
 ### **3️⃣ Configuration**
 Créer un fichier `.env` à la racine et ajouter :
 ```ini
-PORT=21401
-MONGO_URI=mongodb://localhost:27017/products
-RABBITMQ_URL=amqp://localhost
-JWT_SECRET=supersecret
-DEFAULT_ACCESS_TOKEN=your_default_token
+PORT=
+MONGO_URI=
+RABBITMQ_URL=
+JWT_SECRET=
+DEFAULT_ACCESS_TOKEN=
 ```
 
 ### **4️⃣ Installer les dépendances**
