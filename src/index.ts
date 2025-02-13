@@ -35,7 +35,7 @@ app.get("/metrics", metricsEndpoint);
 const PORT = process.env.NODE_ENV === "test" ? process.env.TEST_PORT : process.env.PORT;
 
 if (process.env.NODE_ENV !== "test") {
-    app.listen(PORT, () => console.log(`🚀 Serveur en écoute sur le port ${PORT}`));
+    app.listen(PORT, () => console.log(` Serveur en écoute sur le port ${PORT}`));
 }
 
 // Un seul `export default`

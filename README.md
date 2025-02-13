@@ -12,7 +12,7 @@ API Products est une application Node.js avec Express.js, MongoDB et RabbitMQ, c
 
 ### **2️⃣ Cloner le dépôt**
 ```bash
-git clone https://github.com/tonrepo/api-product.git
+git clone https://github.com/Gleen99/API-Product.git
 ```
 
 ### **3️⃣ Configuration**

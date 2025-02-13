@@ -13,7 +13,7 @@ const generateToken = () => {
     const payload = { role: "api_product" };
     const accessToken = jwt.sign(payload, SECRET_KEY, { expiresIn: "7d" });
 
-    console.log("🎟 Nouveau Token JWT :", accessToken);
+    console.log("Nouveau Token JWT :", accessToken);
 };
 
 generateToken();
