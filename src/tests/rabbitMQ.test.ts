@@ -3,7 +3,7 @@ import amqplib from "amqplib";
 
 jest.mock("amqplib");
 
-describe("📡 RabbitMQ Utils", () => {
+describe("RabbitMQ Utils", () => {
     let mockChannel: any;
     let mockConnection: any;
 

@@ -1,0 +1,103 @@
+{
+  "info": {
+    "_postman_id": "12345-67890-abcdef",
+    "name": "API Products Collection",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Obtenir un Token JWT",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{BASE_URL}}/login",
+          "host": ["{{BASE_URL}}"],
+          "path": ["login"]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"email\": \"test@example.com\",\n  \"password\": \"password123\"\n}"
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Lister les Produits",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{TOKEN}}"
+          }
+        ],
+        "url": {
+          "raw": "{{BASE_URL}}/api/products",
+          "host": ["{{BASE_URL}}"],
+          "path": ["api", "products"]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Créer un Produit",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{TOKEN}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{BASE_URL}}/api/products",
+          "host": ["{{BASE_URL}}"],
+          "path": ["api", "products"]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"name\": \"Produit Test\",\n  \"price\": 99.99,\n  \"category\": \"Tech\"\n}"
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Supprimer un Produit",
+      "request": {
+        "method": "DELETE",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{TOKEN}}"
+          }
+        ],
+        "url": {
+          "raw": "{{BASE_URL}}/api/products/123",
+          "host": ["{{BASE_URL}}"],
+          "path": ["api", "products", "123"]
+        }
+      },
+      "response": []
+    }
+  ],
+  "variable": [
+    {
+      "key": "BASE_URL",
+      "value": "http://localhost:8080"
+    },
+    {
+      "key": "TOKEN",
+      "value": ""
+    }
+  ]
+}

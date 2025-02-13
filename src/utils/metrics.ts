@@ -15,7 +15,7 @@ register.registerMetric(httpRequestCounter);
 
 const metricsMiddleware = (req: any, res: any , next: any) => {
     res.on("finish", () => {
-        console.log(`📊 Requête : ${req.method} ${req.path} - ${res.statusCode}`);
+        console.log(`Requête : ${req.method} ${req.path} - ${res.statusCode}`);
         httpRequestCounter.inc({
             method: req.method,
             route: req.path,
