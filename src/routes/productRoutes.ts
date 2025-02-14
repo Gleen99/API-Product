@@ -6,9 +6,10 @@ import {
     updateProduct,
     deleteProduct,
 } from "../controllers/productController";
-import { authMiddleware } from "../middlewares/authMiddleware";
+import authMiddleware from "../middlewares/authMiddleware";
 
 const router: Router = express.Router();
+router.use(authMiddleware);
 
 /**
  * @swagger
@@ -29,7 +30,7 @@ const router: Router = express.Router();
  *       500:
  *         description: Erreur serveur
  */
-router.get("/", getProducts);
+router.get("/", authMiddleware, getProducts);
 
 /**
  * @swagger
@@ -50,7 +51,7 @@ router.get("/", getProducts);
  *       404:
  *         description: Produit non trouvé
  */
-router.get("/:id", getProductById);
+router.get("/:id", authMiddleware, getProductById);
 
 /**
  * @swagger
