@@ -6,41 +6,50 @@
   },
   "item": [
     {
-      "name": "Obtenir un Token JWT",
-      "request": {
-        "method": "POST",
-        "header": [
-          {
-            "key": "Content-Type",
-            "value": "application/json"
-          }
-        ],
-        "url": {
-          "raw": "{{BASE_URL}}/login",
-          "host": ["{{BASE_URL}}"],
-          "path": ["login"]
-        },
-        "body": {
-          "mode": "raw",
-          "raw": "{\n  \"email\": \"test@example.com\",\n  \"password\": \"password123\"\n}"
-        }
-      },
-      "response": []
-    },
-    {
       "name": "Lister les Produits",
       "request": {
         "method": "GET",
         "header": [
           {
             "key": "Authorization",
-            "value": "Bearer {{TOKEN}}"
+            "value": "Bearer {{TOKEN}}",
+            "type": "text"
           }
         ],
         "url": {
           "raw": "{{BASE_URL}}/api/products",
-          "host": ["{{BASE_URL}}"],
-          "path": ["api", "products"]
+          "host": [
+            "{{BASE_URL}}"
+          ],
+          "path": [
+            "api",
+            "products"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Récupérer un Produit par ID",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{TOKEN}}",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "{{BASE_URL}}/api/products/123",
+          "host": [
+            "{{BASE_URL}}"
+          ],
+          "path": [
+            "api",
+            "products",
+            "123"
+          ]
         }
       },
       "response": []
@@ -52,17 +61,24 @@
         "header": [
           {
             "key": "Authorization",
-            "value": "Bearer {{TOKEN}}"
+            "value": "Bearer {{TOKEN}}",
+            "type": "text"
           },
           {
             "key": "Content-Type",
-            "value": "application/json"
+            "value": "application/json",
+            "type": "text"
           }
         ],
         "url": {
           "raw": "{{BASE_URL}}/api/products",
-          "host": ["{{BASE_URL}}"],
-          "path": ["api", "products"]
+          "host": [
+            "{{BASE_URL}}"
+          ],
+          "path": [
+            "api",
+            "products"
+          ]
         },
         "body": {
           "mode": "raw",
@@ -78,13 +94,20 @@
         "header": [
           {
             "key": "Authorization",
-            "value": "Bearer {{TOKEN}}"
+            "value": "Bearer {{TOKEN}}",
+            "type": "text"
           }
         ],
         "url": {
           "raw": "{{BASE_URL}}/api/products/123",
-          "host": ["{{BASE_URL}}"],
-          "path": ["api", "products", "123"]
+          "host": [
+            "{{BASE_URL}}"
+          ],
+          "path": [
+            "api",
+            "products",
+            "123"
+          ]
         }
       },
       "response": []
@@ -93,7 +116,7 @@
   "variable": [
     {
       "key": "BASE_URL",
-      "value": "http://localhost:8080"
+      "value": "http://localhost:5002"
     },
     {
       "key": "TOKEN",

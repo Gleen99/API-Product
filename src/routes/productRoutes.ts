@@ -6,10 +6,11 @@ import {
     updateProduct,
     deleteProduct,
 } from "../controllers/productController";
-import { authMiddleware } from "../middlewares/authMiddleware";
+import authMiddleware  from "../middlewares/authMiddleware";
 import logger from "../utils/logger";
 
 const router: Router = express.Router();
+router.use(authMiddleware);
 
 // Middleware de log des requêtes
 router.use((req: Request, res: Response, next: NextFunction) => {

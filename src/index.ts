@@ -38,5 +38,4 @@ if (process.env.NODE_ENV !== "test") {
     app.listen(PORT, () => console.log(` Serveur en écoute sur le port ${PORT}`));
 }
 
-// Un seul `export default`
 export default app;

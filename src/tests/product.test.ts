@@ -23,7 +23,7 @@ afterAll(async () => {
     await closeRabbitMQ();
 });
 
-describe("🛒 Product API", () => {
+describe("Product API", () => {
     it(" Devrait retourner la liste des produits", async () => {
         const res = await request(app).get("/api/products");
         expect(res.status).toBe(200);
