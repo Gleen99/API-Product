@@ -1,4 +1,4 @@
-import express, { Router } from "express";
+import express, { Router, Request, Response, NextFunction } from "express";
 import {
     getProducts,
     getProductById,
@@ -7,9 +7,15 @@ import {
     deleteProduct,
 } from "../controllers/productController";
 import { authMiddleware } from "../middlewares/authMiddleware";
+import logger from "../utils/logger";
+
 
 const router: Router = express.Router();
 
+router.use((req: Request, res: Response, next: NextFunction) => {
+    logger.info(`[${req.method}] Requête reçue sur ${req.originalUrl}`);
+    next();
+});
 /**
  * @swagger
  * tags:
