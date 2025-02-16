@@ -9,13 +9,14 @@ import {
 import { authMiddleware } from "../middlewares/authMiddleware";
 import logger from "../utils/logger";
 
-
 const router: Router = express.Router();
 
+// Middleware de log des requêtes
 router.use((req: Request, res: Response, next: NextFunction) => {
     logger.info(`[${req.method}] Requête reçue sur ${req.originalUrl}`);
     next();
 });
+
 /**
  * @swagger
  * tags:
@@ -29,6 +30,8 @@ router.use((req: Request, res: Response, next: NextFunction) => {
  *   get:
  *     summary: Récupérer tous les produits
  *     tags: [Products]
+ *     security:
+ *       - bearerAuth: []
  *     responses:
  *       200:
  *         description: Liste des produits retournée avec succès
@@ -43,6 +46,8 @@ router.get("/", authMiddleware, getProducts);
  *   get:
  *     summary: Récupérer un produit par son ID
  *     tags: [Products]
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -55,6 +60,8 @@ router.get("/", authMiddleware, getProducts);
  *         description: Produit trouvé
  *       404:
  *         description: Produit non trouvé
+ *       401:
+ *         description: Non autorisé (JWT manquant ou invalide)
  */
 router.get("/:id", authMiddleware, getProductById);
 

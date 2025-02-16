@@ -9,7 +9,7 @@ interface AuthRequest extends Request {
 }
 
 export const authMiddleware = (req: AuthRequest, res: Response, next: NextFunction): void => {
-    let token = req.header("Authorization")?.split(" ")[1] || process.env.DEFAULT_ACCESS_TOKEN;
+    let token = req.header("Authorization")?.split(" ")[1];
 
     if (!token) {
         res.status(401).json({ message: "Accès refusé, token manquant" });
@@ -17,9 +17,8 @@ export const authMiddleware = (req: AuthRequest, res: Response, next: NextFuncti
     }
 
     try {
-        const SECRET_KEY = process.env.JWT_SECRET || "supersecret";
-        const decoded = jwt.verify(token, SECRET_KEY);
-        req.client = decoded;
+        const decoded = jwt.verify(token, process.env.JWT_SECRET as string);
+        (req as any).user = decoded;
         next();
     } catch (error: any) {
         console.error("Erreur JWT :", error.message);
