@@ -1,4 +1,5 @@
 import { Request, Response } from "express";
+import mongoose from "mongoose";
 import Product from "../models/productModel";
 import { publishToQueue } from "../utils/rabbitmq";
 import logger from "../utils/logger";
@@ -17,15 +18,26 @@ export const getProducts = async (req: Request, res: Response): Promise<void> =>
 
 export const getProductById = async (req: Request, res: Response): Promise<void> => {
     try {
-        const product = await Product.findById(req.params.id);
+        const { id } = req.params;
+        if (!mongoose.Types.ObjectId.isValid(id)) {
+            logger.warn("ID produit invalide");
+            res.status(400).json({ message: "ID produit invalide" });
+            return;
+        }
+        const product = await Product.findById(id);
         if (!product) {
             logger.warn("Produit non trouvé");
             res.status(404).json({ message: "Produit non trouvé" });
             return;
         }
-        logger.info(`Produit récupéré: ${req.params.id}`);
+        logger.info(`Produit récupéré: ${id}`);
         res.json(product);
     } catch (error) {
+        if (error instanceof mongoose.Error.CastError) {
+            logger.warn("ID produit invalide (CastError)");
+            res.status(400).json({ message: "ID produit invalide" });
+            return;
+        }
         logger.error("Erreur lors de la récupération du produit", error);
         res.status(500).json({ message: "Erreur serveur" });
     }
@@ -63,16 +75,27 @@ export const updateProduct = async (req: Request, res: Response): Promise<void> 
 
 export const deleteProduct = async (req: Request, res: Response): Promise<void> => {
     try {
-        const deletedProduct = await Product.findByIdAndDelete(req.params.id);
+        const { id } = req.params;
+        if (!mongoose.Types.ObjectId.isValid(id)) {
+            logger.warn("ID produit invalide");
+            res.status(400).json({ message: "ID produit invalide" });
+            return;
+        }
+        const deletedProduct = await Product.findByIdAndDelete(id);
         if (!deletedProduct) {
             logger.warn("Produit non trouvé pour suppression");
             res.status(404).json({ message: "Produit non trouvé" });
             return;
         }
         await publishToQueue("product_deleted", JSON.stringify(deletedProduct));
-        logger.info(`Produit supprimé: ${req.params.id}`);
+        logger.info(`Produit supprimé: ${id}`);
         res.json({ message: "Produit supprimé" });
     } catch (error) {
+        if (error instanceof mongoose.Error.CastError) {
+            logger.warn("ID produit invalide (CastError)");
+            res.status(400).json({ message: "ID produit invalide" });
+            return;
+        }
         logger.error("Erreur lors de la suppression du produit", error);
         res.status(500).json({ message: "Erreur serveur" });
     }
