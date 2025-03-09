@@ -12,7 +12,6 @@ import logger from "../utils/logger";
 const router: Router = express.Router();
 router.use(authMiddleware);
 
-// Middleware de log des requêtes
 router.use((req: Request, res: Response, next: NextFunction) => {
     logger.info(`[${req.method}] Requête reçue sur ${req.originalUrl}`);
     next();

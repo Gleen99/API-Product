@@ -1,4 +1,6 @@
 import amqplib, { Connection, Channel } from "amqplib";
+import logger from "./logger";
+import Product from "../models/productModel";
 
 let connection: Connection;
 let channel: Channel;
@@ -40,3 +42,47 @@ export const closeRabbitMQ = async () => {
         console.error("Erreur lors de la fermeture de RabbitMQ:", error.message);
     }
 };
+export async function startOrderConsumer() {
+    try {
+        if (!channel) {
+            logger.warn("Le canal RabbitMQ n'est pas encore prêt. Tentative de reconnexion...");
+            await connectRabbitMQ();
+        }
+
+        const queue = "order_retrieved";
+
+        await channel.assertQueue(queue, { durable: true });
+
+        logger.info(`En écoute sur la queue : ${queue}`);
+
+        channel.consume(queue, async (msg) => {
+            if (msg !== null) {
+                try {
+                    const order = JSON.parse(msg.content.toString());
+                    logger.info(`Commande reçue : ${JSON.stringify(order)}`);
+
+                    const items = order.data.items;
+
+                    for (const itemId of items) {
+                        const productData = await Product.findOne({ _id: itemId });
+                        if (productData) {
+                            productData.stock = Math.max(productData.stock - 1, 0);
+                            await productData.save();
+                            logger.info(`Stock mis à jour pour l'article ${itemId}: ${productData.stock}`);
+                        } else {
+                            logger.warn(`Produit introuvable : ${itemId}`);
+                        }
+                    }
+
+                    channel.ack(msg);
+                    logger.info("Message traité avec succès.");
+                } catch (err) {
+                    logger.error("Erreur lors du traitement du message RabbitMQ : ", err);
+                    channel.nack(msg, false, false);
+                }
+            }
+        });
+    } catch (error) {
+        logger.error("Erreur dans le consumer RabbitMQ : ", error);
+    }
+}
