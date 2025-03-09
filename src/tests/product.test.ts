@@ -2,9 +2,17 @@ import request from "supertest";
 import app from "../index";
 import mongoose from "mongoose";
 import { MongoMemoryServer } from "mongodb-memory-server";
-import {closeRabbitMQ} from "../utils/rabbitmq";
+import jwt from "jsonwebtoken";
+
+// Mock de RabbitMQ
+jest.mock("../utils/rabbitmq", () => ({
+    publishToQueue: jest.fn(),
+    closeRabbitMQ: jest.fn(),
+    connectRabbitMQ: jest.fn(),
+}));
 
 let mongoServer: MongoMemoryServer;
+let testToken: string;
 
 beforeAll(async () => {
     jest.setTimeout(50000);
@@ -15,17 +23,26 @@ beforeAll(async () => {
     if (mongoose.connection.readyState === 0) {
         await mongoose.connect(mongoUri);
     }
+
+    // Générer un token JWT sécurisé pour les tests
+    testToken = jwt.sign(
+        { userId: "67ab1abe5905025733f3661f", role: "api_client" },
+        process.env.JWT_SECRET as string,
+        { expiresIn: "1h" }
+    );
 });
 
 afterAll(async () => {
     await mongoose.connection.close();
     await mongoServer.stop();
-    await closeRabbitMQ();
 });
 
 describe("Product API", () => {
-    it(" Devrait retourner la liste des produits", async () => {
-        const res = await request(app).get("/api/products");
+    it("Devrait retourner la liste des produits", async () => {
+        const res = await request(app)
+            .get("/api/products")
+            .set("Authorization", `Bearer ${testToken}`);
+
         expect(res.status).toBe(200);
         expect(res.body).toBeInstanceOf(Array);
     });
@@ -40,7 +57,7 @@ describe("Product API", () => {
 
         const res = await request(app)
             .post("/api/products")
-            .set("Authorization", `Bearer ${process.env.DEFAULT_ACCESS_TOKEN}`)
+            .set("Authorization", `Bearer ${testToken}`)
             .send(product);
 
         expect(res.status).toBe(201);
@@ -57,12 +74,15 @@ describe("Product API", () => {
 
         const createdProduct = await request(app)
             .post("/api/products")
-            .set("Authorization", `Bearer ${process.env.DEFAULT_ACCESS_TOKEN}`)
+            .set("Authorization", `Bearer ${testToken}`)
             .send(product);
 
         const productId = createdProduct.body._id;
 
-        const res = await request(app).get(`/api/products/${productId}`);
+        const res = await request(app)
+            .get(`/api/products/${productId}`)
+            .set("Authorization", `Bearer ${testToken}`);
+
         expect(res.status).toBe(200);
         expect(res.body.name).toBe(product.name);
     });
@@ -77,14 +97,14 @@ describe("Product API", () => {
 
         const createdProduct = await request(app)
             .post("/api/products")
-            .set("Authorization", `Bearer ${process.env.DEFAULT_ACCESS_TOKEN}`)
+            .set("Authorization", `Bearer ${testToken}`)
             .send(product);
 
         const updatedData = { name: "Produit Modifié", price: 120 };
 
         const res = await request(app)
             .put(`/api/products/${createdProduct.body._id}`)
-            .set("Authorization", `Bearer ${process.env.DEFAULT_ACCESS_TOKEN}`)
+            .set("Authorization", `Bearer ${testToken}`)
             .send(updatedData);
 
         expect(res.status).toBe(200);
@@ -101,12 +121,12 @@ describe("Product API", () => {
 
         const createdProduct = await request(app)
             .post("/api/products")
-            .set("Authorization", `Bearer ${process.env.DEFAULT_ACCESS_TOKEN}`)
+            .set("Authorization", `Bearer ${testToken}`)
             .send(product);
 
         const res = await request(app)
             .delete(`/api/products/${createdProduct.body._id}`)
-            .set("Authorization", `Bearer ${process.env.DEFAULT_ACCESS_TOKEN}`);
+            .set("Authorization", `Bearer ${testToken}`);
 
         expect(res.status).toBe(200);
     });
