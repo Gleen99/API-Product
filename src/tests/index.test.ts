@@ -5,8 +5,23 @@ import app, { connectToDatabase, startServer } from "../index";
 
 jest.mock("../utils/rabbitmq", () => ({
   connectRabbitMQ: jest.fn(),
+  startOrderConsumer: jest.fn()
 }));
-
+jest.mock("../models/productModel", () => {
+  return {
+      __esModule: true,
+      default: {
+          find: jest.fn(),
+          findById: jest.fn(),
+          findByIdAndUpdate: jest.fn(),
+          findByIdAndDelete: jest.fn(),
+          create: jest.fn(),
+          prototype: {
+              save: jest.fn(),
+          },
+      },
+  };
+});
 describe("Index.ts - Tests généraux", () => {
   let mongoServer: MongoMemoryServer;
 

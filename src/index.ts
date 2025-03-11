@@ -4,7 +4,7 @@ import dotenv from "dotenv";
 import cors from "cors";
 import bodyParser from "body-parser";
 import productRoutes from "./routes/productRoutes";
-import startOrderConsumer, { connectRabbitMQ } from "./utils/rabbitmq";
+import  {startOrderConsumer, connectRabbitMQ } from "./utils/rabbitmq";
 import swaggerUi from "swagger-ui-express";
 import swaggerDocs from "./utils/swagger";
 import { metricsEndpoint } from "./utils/metrics";
@@ -22,7 +22,7 @@ app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocs));
 
 // Connexion à RabbitMQ
 connectRabbitMQ();
-startOrderConsumer
+startOrderConsumer()
 
 // Exposition des métriques Prometheus
 app.get("/metrics", metricsEndpoint);

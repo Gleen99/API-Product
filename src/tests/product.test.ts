@@ -6,9 +6,10 @@ import jwt from "jsonwebtoken";
 
 // Mock de RabbitMQ
 jest.mock("../utils/rabbitmq", () => ({
+    connectRabbitMQ: jest.fn(),
+    startOrderConsumer: jest.fn(),
     publishToQueue: jest.fn(),
     closeRabbitMQ: jest.fn(),
-    connectRabbitMQ: jest.fn(),
 }));
 
 let mongoServer: MongoMemoryServer;

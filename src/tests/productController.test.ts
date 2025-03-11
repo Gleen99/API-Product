@@ -4,7 +4,21 @@ import { Request, Response } from "express";
 import mongoose from "mongoose";
 import logger from "../utils/logger";
 
-jest.mock("../models/productModel");
+jest.mock("../models/productModel", () => {
+    return {
+        __esModule: true,
+        default: {
+            find: jest.fn(),
+            findById: jest.fn(),
+            findByIdAndUpdate: jest.fn(),
+            findByIdAndDelete: jest.fn(),
+            create: jest.fn(),
+            prototype: {
+                save: jest.fn(),
+            },
+        },
+    };
+});
 
 describe("Product Controller", () => {
     let req: Partial<Request>;
@@ -29,7 +43,7 @@ describe("Product Controller", () => {
     });
 
     it("Devrait retourner une erreur 404 si getProductById ne trouve rien", async () => {
-        req = { params: { id: new mongoose.Types.ObjectId().toString() } }; // ID valide mais inexistant
+        req = { params: { id: new mongoose.Types.ObjectId().toString() } };
         (Product.findById as jest.Mock).mockResolvedValue(null);
 
         await getProductById(req as Request, res as Response);
@@ -39,7 +53,7 @@ describe("Product Controller", () => {
     });
 
     it("Devrait retourner une erreur 400 si l’ID est invalide dans getProductById", async () => {
-        req = { params: { id: "invalid_id" } }; // ID invalide
+        req = { params: { id: "invalid_id" } };
 
         await getProductById(req as Request, res as Response);
 
@@ -68,7 +82,7 @@ describe("Product Controller", () => {
     });
 
     it("Devrait retourner une erreur 404 si deleteProduct ne trouve rien", async () => {
-        req = { params: { id: new mongoose.Types.ObjectId().toString() } }; // ID valide mais inexistant
+        req = { params: { id: new mongoose.Types.ObjectId().toString() } }; 
         (Product.findByIdAndDelete as jest.Mock).mockResolvedValue(null);
 
         await deleteProduct(req as Request, res as Response);
@@ -78,7 +92,7 @@ describe("Product Controller", () => {
     });
 
     it("Devrait retourner une erreur 400 si l’ID est invalide dans deleteProduct", async () => {
-        req = { params: { id: "invalid_id" } }; // ID invalide
+        req = { params: { id: "invalid_id" } }; 
 
         await deleteProduct(req as Request, res as Response);
 

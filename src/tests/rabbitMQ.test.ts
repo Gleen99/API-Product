@@ -1,5 +1,5 @@
 import Product from "../models/productModel";
-import startOrderConsumer, { connectRabbitMQ, publishToQueue, closeRabbitMQ } from "../utils/rabbitmq";
+import  { connectRabbitMQ, publishToQueue, closeRabbitMQ,startOrderConsumer } from "../utils/rabbitmq";
 import amqplib from "amqplib";
 
 jest.mock("amqplib");
@@ -59,7 +59,7 @@ describe("RabbitMQ Utils", () => {
     it("Devrait écouter et traiter un message correctement", async () => {
         // Simule une commande avec des articles
         const fakeOrder = {
-            data: { items: ["product123"] }
+             items: ["product123"] 
         };
     
         mockMsg = {
@@ -82,11 +82,30 @@ describe("RabbitMQ Utils", () => {
 
         await new Promise((resolve) => setTimeout(resolve, 100));
     
-        expect(mockChannel.assertQueue).toHaveBeenCalledWith("order_retrieved", { durable: true });
+        expect(mockChannel.assertQueue).toHaveBeenCalledWith("orders_created", { durable: true });
         expect(Product.findOne).toHaveBeenCalledWith({ _id: "product123" });
         expect(mockChannel.ack).toHaveBeenCalledWith(mockMsg);
     });    
+    it("Devrait démarrer correctement le consumer et traiter un message valide", async () => {
+        mockMsg = {
+            content: Buffer.from(JSON.stringify({ items: ["product123"] }))
+        };
 
+        (Product.findOne as jest.Mock).mockResolvedValueOnce({
+            stock: 10,
+            save: jest.fn()
+        });
+
+        mockChannel.consume.mockImplementation((_queue:any, callback:any) => {
+            callback(mockMsg);
+        });
+
+        await startOrderConsumer();
+
+        await new Promise((resolve) => setTimeout(resolve, 100));
+
+        expect(mockChannel.ack).toHaveBeenCalledWith(mockMsg);
+    });
     it("Devrait ne pas traiter un message invalide", async () => {
         mockMsg = {
             content: Buffer.from("message_invalide")
@@ -132,7 +151,7 @@ describe("RabbitMQ Utils", () => {
     it("Devrait gérer une erreur lors du traitement d'un message RabbitMQ", async () => {
         // Simule un message valide
         mockMsg = {
-            content: Buffer.from(JSON.stringify({ data: { items: ["product123"] } }))
+            content: Buffer.from(JSON.stringify({  items: ["product123"] }))
         };
     
         // Simule une erreur lors de la récupération du produit
