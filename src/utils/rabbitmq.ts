@@ -42,7 +42,8 @@ export const closeRabbitMQ = async () => {
         console.error("Erreur lors de la fermeture de RabbitMQ:", error.message);
     }
 };
-export async function startOrderConsumer() {
+
+async function startOrderConsumer() {
     try {
         if (!channel) {
             logger.warn("Le canal RabbitMQ n'est pas encore prêt. Tentative de reconnexion...");
@@ -86,3 +87,6 @@ export async function startOrderConsumer() {
         logger.error("Erreur dans le consumer RabbitMQ : ", error);
     }
 }
+
+export default startOrderConsumer;
+
