@@ -3,6 +3,11 @@ import startOrderConsumer, { connectRabbitMQ, publishToQueue, closeRabbitMQ } fr
 import amqplib from "amqplib";
 
 jest.mock("amqplib");
+jest.mock("../utils/logger", () => ({
+    error: jest.fn(),
+    warn: jest.fn(),
+    info: jest.fn(),
+}));
 jest.mock("../models/productModel", () => ({
     findOne: jest.fn()
 }));
@@ -95,4 +100,54 @@ describe("RabbitMQ Utils", () => {
 
         expect(mockChannel.nack).toHaveBeenCalledWith(mockMsg, false, false);
     });
-});
+    it("Devrait gérer une erreur de connexion à RabbitMQ", async () => {
+        // Simule une erreur lors de la connexion
+        (amqplib.connect as jest.Mock).mockRejectedValueOnce(new Error("Échec de connexion"));
+    
+
+        const consoleErrorSpy = jest.spyOn(console, "error").mockImplementation(() => {});
+    
+        await expect(connectRabbitMQ()).rejects.toThrow("RabbitMQ Down");
+    
+        // Vérifie que l'erreur est bien loggée
+        expect(consoleErrorSpy).toHaveBeenCalledWith("Erreur de connexion à RabbitMQ:", "Échec de connexion");
+    
+        consoleErrorSpy.mockRestore();
+    });
+    it("Devrait gérer une erreur lors de l'envoi d'un message à RabbitMQ", async () => {
+        // Simule une erreur lors de l'envoi du message
+        mockChannel.sendToQueue.mockImplementationOnce(() => {
+            throw new Error("Échec de l'envoi du message");
+        });
+    
+        const consoleErrorSpy = jest.spyOn(console, "error").mockImplementation(() => {});
+    
+        await expect(publishToQueue("test_queue", "Message en échec")).rejects.toThrow("Échec de l'envoi du message");
+    
+        // Vérifie que l'erreur est bien loggée
+        expect(consoleErrorSpy).toHaveBeenCalledWith("Erreur d'envoi du message à RabbitMQ:", "Échec de l'envoi du message");
+    
+        consoleErrorSpy.mockRestore();
+    });
+    it("Devrait gérer une erreur lors du traitement d'un message RabbitMQ", async () => {
+        // Simule un message valide
+        mockMsg = {
+            content: Buffer.from(JSON.stringify({ data: { items: ["product123"] } }))
+        };
+    
+        // Simule une erreur lors de la récupération du produit
+        (Product.findOne as jest.Mock).mockRejectedValueOnce(new Error("Erreur DB"));
+    
+        mockChannel.consume.mockImplementation((_queue: any, callback: any) => {
+            callback(mockMsg);
+        });
+    
+        await startOrderConsumer();
+    
+        await new Promise((resolve) => setTimeout(resolve, 100));
+    
+        // Vérifie que le message est bien rejeté
+        expect(mockChannel.nack).toHaveBeenCalledWith(mockMsg, false, false);
+    });
+    
+});    
