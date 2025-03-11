@@ -32,6 +32,13 @@ router.use((req: Request, res: Response, next: NextFunction) => {
  *     tags: [Products]
  *     security:
  *       - bearerAuth: []
+ *     parameters:
+ *       - in: header
+ *         name: Authorization
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Bearer token
  *     responses:
  *       200:
  *         description: Liste des produits retournée avec succès
@@ -49,6 +56,12 @@ router.get("/", authMiddleware, getProducts);
  *     security:
  *       - bearerAuth: []
  *     parameters:
+ *       - in: header
+ *         name: Authorization
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Bearer token
  *       - in: path
  *         name: id
  *         required: true
@@ -73,6 +86,13 @@ router.get("/:id", authMiddleware, getProductById);
  *     tags: [Products]
  *     security:
  *       - bearerAuth: []
+ *     parameters:
+ *       - in: header
+ *         name: Authorization
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Bearer token
  *     requestBody:
  *       required: true
  *       content:
@@ -107,6 +127,12 @@ router.post("/", authMiddleware, createProduct);
  *     security:
  *       - bearerAuth: []
  *     parameters:
+ *       - in: header
+ *         name: Authorization
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Bearer token
  *       - in: path
  *         name: id
  *         required: true
@@ -147,6 +173,12 @@ router.put("/:id", authMiddleware, updateProduct);
  *     security:
  *       - bearerAuth: []
  *     parameters:
+ *       - in: header
+ *         name: Authorization
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Bearer token
  *       - in: path
  *         name: id
  *         required: true
